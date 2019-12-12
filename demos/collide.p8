@@ -40,6 +40,14 @@ function _init()
  pl = make_actor(2,2)
  pl.spr = 17
  
+ -- tiny guy
+ 
+ tiny = make_actor(7,5)
+ tiny.spr=5
+ tiny.frames=4
+ tiny.dx=1/8
+ tiny.inertia=0.8
+
  -- make a bouncy ball
  local ball = make_actor(8.5,7.5)
  ball.spr = 33
@@ -47,22 +55,14 @@ function _init()
  ball.dy=-0.1
  ball.inertia=0.5
  
- local ball = make_actor(7,5)
+ local ball = make_actor(5,5)
  ball.spr = 49
  ball.dx=-0.1
  ball.dy=0.15
  ball.inertia=1
  ball.bounce = 0.8
  
- 
- -- tiny guy
- 
- a = make_actor(7,5)
- a.spr=5
- a.frames=4
- a.dx=1/8
- a.inertia=0.8
- 
+
  
 end
 
@@ -114,23 +114,22 @@ function solid_actor(a, dx, dy)
     -- this allows actors to
     -- overlap initially 
     -- without sticking together    
-    if (dx != 0 and abs(x) <
-        abs(a.x-a2.x)) then
-     v=a.dx + a2.dy
+    local d = false
+    if (abs(x) <= abs(a.x-a2.x)) then
+     local v=a.dx + a2.dx
      a.dx = v/2
-     a2.dx = v/2
-     return true 
+     -- a2.dx = v/2
+     d = true
     end
     
-    if (dy != 0 and abs(y) <
-        abs(a.y-a2.y)) then
-     v=a.dy + a2.dy
+    if (abs(y) <= abs(a.y-a2.y)) then
+     local v=a.dy + a2.dy
      a.dy=v/2
-     a2.dy=v/2
-     return true 
+     -- a2.dy=v/2
+     d = true
     end
     
-    --return true
+    return d
     
    end
   end
@@ -141,6 +140,9 @@ end
 
 -- checks both walls and actors
 function solid_a(a, dx, dy)
+ if solid_actor(a, dx, dy) then
+  return true
+ end
  if solid_area(a.x+dx,a.y+dy,
     a.w,a.h) then
     return true end
@@ -175,8 +177,8 @@ function move_actor(a)
  -- set dx,dy to zero if you
  -- don't want inertia
  
- a.dx *= a.inertia
- a.dy *= a.inertia
+ -- a.dx *= a.inertia
+ -- a.dy *= a.inertia
  
  -- advance one frame every
  -- time actor moves 1/4 of
@@ -225,8 +227,8 @@ function _draw()
  map(0,0,0,0,16,16)
  foreach(actor,draw_actor)
  
- print("x "..pl.x,0,120,7)
- print("y "..pl.y,64,120,7)
+ print("x "..tiny.x,0,120,7)
+ print("y "..tiny.y,64,120,7)
  
 end
 
