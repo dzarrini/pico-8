@@ -5,7 +5,7 @@ __lua__
 -- by zep
 
 acc = 0.8
-width = 0.4
+width = 8   -- 8 pixels are the size of the character
 actors = {} --all actors in universe
 
 actor = {
@@ -36,22 +36,58 @@ function actor:draw()
   spr(self.id + self.frame, sx, sy)
 end
 
-function actor:collide(actor)
+function actor:collide(a)
     local sx = self.x + self.dx
     local sy = self.y + self.dy
-    local ox = actor.x + actor.dx
-    local oy = actor.y + actor.dy
+    local ox = a.x + a.dx
+    local oy = a.y + a.dy
+    pal(7,7)
+    circ(sx, sy, 1)
+    pal(7,8)
+    circ(sx + self.w, sy + self.h, 1)
+    -- print("y "..sy,64,120,7)
 
-    return 
-      ((sx + self.width) > ox) and 
-      ((sy + self.height) > oy) and
+    local col = false
+    col = col or (
+      ((sx + self.w) > ox) and 
+      ((sy + self.h) > oy) and
       (ox > sx) and 
       (oy > sy)
+    )
+
+    ox = a.x + a.dx + a.w
+    oy = a.y + a.dy
+    col = col or (
+      ((sx + self.w) > ox) and 
+      ((sy + self.h) > oy) and
+      (ox > sx) and 
+      (oy > sy)
+    )
+
+    ox = a.x + a.dx
+    oy = a.y + a.dy + a.h
+    col = col or (
+      ((sx + self.w) > ox) and 
+      ((sy + self.h) > oy) and
+      (ox > sx) and 
+      (oy > sy)
+    )
+
+    ox = a.x + a.dx + a.w
+    oy = a.y + a.dy + a.h
+    col = col or (
+      ((sx + self.w) > ox) and 
+      ((sy + self.h) > oy) and
+      (ox > sx) and 
+      (oy > sy)
+    )
+
+    return col
 end
 
 function print_actor(p1)
  print("x "..p1.x,0,120,7)
- print("y "..p1.y,64,120,7)
+ -- print("y "..p1.y,64,120,7)
 end
 
 function _init()
@@ -62,6 +98,20 @@ function _init()
     frames = 2
   }
   add(actors, p1)
+
+  actor_1 = actor:new{
+    id = 5,
+    x = 56,
+    y = 40,
+    frames = 4
+  }
+  add(actors, actor_1)
+end
+
+function will_collide()
+  if p1:collide(actor_1) or actor_1:collide(p1) then
+    print("col ",64,120,7)
+  end
 end
 
 function control_player(pl)
@@ -81,7 +131,7 @@ function _draw()
 
  map(0,0,0,0,16,16)
  foreach(actors,actor.draw)
- 
+ will_collide()
  print_actor(p1)
 end
 
