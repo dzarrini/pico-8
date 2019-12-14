@@ -22,8 +22,8 @@ actor = {
   w = width,
   h = width,
   draw = function(self)
-    local sx = (self.x * 8) - 4
-    local sy = (self.y * 8) - 4
+    local sx = (self.x * 8)
+    local sy = (self.y * 8)
     spr(self.id + self.frame, sx, sy)
   end
 }
@@ -35,11 +35,16 @@ function actor:new(o)
   return o
 end
 
+function print_actor(p1)
+ print("x "..p1.x,0,120,7)
+ print("y "..p1.y,64,120,7)
+end
+
 function _init()
   p1 = actor:new{
     id = 17,
-    x = 2,
-    y = 2,
+    x = 0,
+    y = 0,
     frames = 2
   }
   add(actors, p1)
@@ -60,13 +65,10 @@ end
 function _draw()
  cls()
 
- -- map(0,0,0,0,16,16)
- -- p1:draw()
+ map(0,0,0,0,16,16)
  foreach(actors,actor.draw)
  
- print("x "..p1.x,0,120,7)
- print("y "..p1.y,64,120,7)
- 
+ print_actor(p1)
 end
 
 __gfx__
