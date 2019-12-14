@@ -4,7 +4,7 @@ __lua__
 -- wall and actor collisions
 -- by zep
 
-acc = 0.1
+acc = 0.8
 width = 0.4
 actors = {} --all actors in universe
 
@@ -21,11 +21,6 @@ actor = {
 
   w = width,
   h = width,
-  draw = function(self)
-    local sx = (self.x * 8)
-    local sy = (self.y * 8)
-    spr(self.id + self.frame, sx, sy)
-  end
 }
 
 function actor:new(o)
@@ -33,6 +28,25 @@ function actor:new(o)
   setmetatable(o, self)
   self.__index = self
   return o
+end
+
+function actor:draw()
+  local sx = (self.x)
+  local sy = (self.y)
+  spr(self.id + self.frame, sx, sy)
+end
+
+function actor:collide(actor)
+    local sx = self.x + self.dx
+    local sy = self.y + self.dy
+    local ox = actor.x + actor.dx
+    local oy = actor.y + actor.dy
+
+    return 
+      ((sx + self.width) > ox) and 
+      ((sy + self.height) > oy) and
+      (ox > sx) and 
+      (oy > sy)
 end
 
 function print_actor(p1)
@@ -59,7 +73,7 @@ end
 
 function _update()
  control_player(pl)
- -- foreach(actors, move_actor)
+ -- foreach(actors, actor.move)
 end
 
 function _draw()
