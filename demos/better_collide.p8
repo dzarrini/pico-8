@@ -4,7 +4,7 @@ __lua__
 -- wall and actor collisions
 -- by zep
 
-acc = 0.8
+acc = 0.10
 width = 8   -- 8 pixels are the size of the character
 actors = {} --all actors in universe
 
@@ -41,11 +41,11 @@ function actor:collide(a)
     local sy = self.y + self.dy
     local ox = a.x + a.dx
     local oy = a.y + a.dy
-    pal(7,7)
-    circ(sx, sy, 1)
-    pal(7,8)
-    circ(sx + self.w, sy + self.h, 1)
-    -- print("y "..sy,64,120,7)
+    -- uncomment for debugging
+    -- pal(7,7)
+    -- circ(sx, sy, 1)
+    -- pal(7,8)
+    -- circ(sx + self.w, sy + self.h, 1)
 
     local col = false
     col = col or (
@@ -108,22 +108,34 @@ function _init()
   add(actors, actor_1)
 end
 
-function will_collide()
-  if p1:collide(actor_1) or actor_1:collide(p1) then
-    print("col ",64,120,7)
+function will_collide(actor_1, actor_2)
+  return actor_1:collide(actor_2) or actor_2:collide(actor_1)
+end
+
+function move_actors()
+  local n = #actors
+  for i=1,n do
+    for j=i+1,n do
+      if will_collide(actors[i],actors[j]) then
+        print("col",64,120,7)
+      else 
+        actors[i].x += actors[i].dx
+        actors[i].y += actors[i].dy
+      end
+    end
   end
 end
 
 function control_player(pl)
-  if (btn(0)) p1.x -= acc
-  if (btn(1)) p1.x += acc
-  if (btn(2)) p1.y -= acc
-  if (btn(3)) p1.y += acc
+  if (btn(0)) p1.dx -= acc
+  if (btn(1)) p1.dx += acc
+  if (btn(2)) p1.dy -= acc
+  if (btn(3)) p1.dy += acc
 end
 
 function _update()
  control_player(pl)
- -- foreach(actors, actor.move)
+ move_actors()
 end
 
 function _draw()
@@ -131,7 +143,6 @@ function _draw()
 
  map(0,0,0,0,16,16)
  foreach(actors,actor.draw)
- will_collide()
  print_actor(p1)
 end
 
