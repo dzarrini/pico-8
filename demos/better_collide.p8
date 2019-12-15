@@ -5,7 +5,8 @@ __lua__
 -- by zep
 
 acc = 0.10
-width = 8   -- 8 pixels are the size of the character
+max_acc = 0.75
+width = 7   -- 8 pixels are the size of the character
 actors = {} --all actors in universe
 
 actor = {
@@ -15,6 +16,8 @@ actor = {
   y = 0,
   dx = 0,
   dy = 0,
+
+  bounce = 0,
 
   frame = 0,
   frames = 0,
@@ -31,7 +34,7 @@ function actor:new(o)
 end
 
 function actor:print() 
-  printh("======================================================================")
+  printh("==================================================")
   printh("id: "..self.id)
   printh("x: "..self.x)
   printh("y: "..self.y)
@@ -94,16 +97,40 @@ function actor:collide(a)
     return col
 end
 
+function solid(x,y)
+  val = mget(x / 8, y / 8)
+  return fget(val, 1)
+end
+
+function solid_wall(x,y,w,h)
+  return
+    solid(x,y) or
+    solid(x + w, y) or
+    solid(x, y + h) or
+    solid(x + w, y + h)
+end
+
+function actor:wall_collide()
+  local sx = self.x + self.dx
+  local sy = self.y + self.dy
+  if solid_wall(sx,self.y,self.w,self.h) then
+    self.dx = self.dx * self.bounce * -1
+  end
+  if solid_wall(self.x,sy,self.w,self.h) then
+    self.dy = self.dy * self.bounce * -1
+  end
+end
+
 function print_actor(p1)
  print("x "..p1.x,0,120,7)
- -- print("y "..p1.y,64,120,7)
+ print("y "..p1.y,64,120,7)
 end
 
 function _init()
   p1 = actor:new{
     id = 17,
-    x = 0,
-    y = 0,
+    x = 8,
+    y = 8,
     frames = 2
   }
   add(actors, p1)
@@ -112,7 +139,9 @@ function _init()
     id = 5,
     x = 56,
     y = 40,
-    frames = 4
+    frames = 4,
+    dx = 0.1,
+    bounce = 1,
   }
   add(actors, actor_1)
 end
@@ -125,6 +154,7 @@ function move_actors()
   local n = #actors
   for i=1,n do
     for j=i+1,n do
+      -- handling actor collision.
       if will_collide(actors[i],actors[j]) then
         -- actors[i]:print()
         -- actors[j]:print()
@@ -138,6 +168,7 @@ function move_actors()
         -- actors[j]:print()
       end 
     end
+    actors[i]:wall_collide()
     actors[i].x += actors[i].dx
     actors[i].y += actors[i].dy
   end
@@ -148,6 +179,22 @@ function control_player(pl)
   if (btn(1)) p1.dx += acc
   if (btn(2)) p1.dy -= acc
   if (btn(3)) p1.dy += acc
+
+  if p1.dx > max_acc then
+    p1.dx = max_acc
+  end
+
+  if p1.dx < -1*max_acc then
+    p1.dx = -1 * max_acc
+  end
+
+  if p1.dy > max_acc then
+    p1.dy = max_acc
+  end
+
+  if p1.dy < -1*max_acc then
+    p1.dy = -1*max_acc
+  end
 end
 
 function _update()
