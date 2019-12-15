@@ -30,6 +30,15 @@ function actor:new(o)
   return o
 end
 
+function actor:print() 
+  printh("======================================================================")
+  printh("id: "..self.id)
+  printh("x: "..self.x)
+  printh("y: "..self.y)
+  printh("dx: "..self.dx)
+  printh("dy: "..self.dy)
+end
+
 function actor:draw()
   local sx = (self.x)
   local sy = (self.y)
@@ -117,12 +126,20 @@ function move_actors()
   for i=1,n do
     for j=i+1,n do
       if will_collide(actors[i],actors[j]) then
-        print("col",64,120,7)
-      else 
-        actors[i].x += actors[i].dx
-        actors[i].y += actors[i].dy
-      end
+        -- actors[i]:print()
+        -- actors[j]:print()
+        local temp_dx = actors[i].dx
+        local temp_dy = actors[i].dy
+        actors[i].dx = actors[j].dx
+        actors[i].dy = actors[j].dy
+        actors[j].dx = temp_dx
+        actors[j].dy = temp_dy
+        -- actors[i]:print()
+        -- actors[j]:print()
+      end 
     end
+    actors[i].x += actors[i].dx
+    actors[i].y += actors[i].dy
   end
 end
 
