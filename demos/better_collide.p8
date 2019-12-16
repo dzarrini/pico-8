@@ -24,6 +24,8 @@ actor = {
 
   w = width,
   h = width,
+  
+  obst_col = {},
 }
 
 function actor:new(o)
@@ -46,6 +48,20 @@ function actor:draw()
   local sx = (self.x)
   local sy = (self.y)
   spr(self.id + self.frame, sx, sy)
+end
+
+function actor:stop()
+  self.dx = 0
+  self.dy = 0
+end
+
+function actor:did_collide(a)
+  for _, val in pairs(self.obst_col) do
+    if val == a.id then
+      return true
+    end
+  end
+  return false
 end
 
 function actor:collide(a)
@@ -131,6 +147,10 @@ function print_actor(p1)
  print("y "..p1.y,64,120,7)
 end
 
+function print_promt()
+ print("catch pikachu & avoid obstacles",0,104,7)
+end
+
 function _init()
   p1 = actor:new{
     id = 17,
@@ -140,15 +160,15 @@ function _init()
   }
   add(actors, p1)
 
-  actor_1 = actor:new{
-    id = 5,
+  pikachu = actor:new{
+    id = 21,
     x = 8,
     y = 88,
     frames = 4,
     dx = 0.5,
     bounce = 1,
   }
-  add(actors, actor_1)
+  add(actors, pikachu)
 
   local ball = actor:new{
     id = 33,
@@ -201,6 +221,8 @@ function move_actors()
         actors[j].dy = temp_dy
         -- actors[i]:print()
         -- actors[j]:print()
+        add(actors[i].obst_col,actors[j].id)
+        add(actors[j].obst_col,actors[i].id)
       end 
     end
     actors[i]:wall_collide()
@@ -241,7 +263,13 @@ function _draw()
 
  map(0,0,0,0,16,16)
  foreach(actors,actor.draw)
- print_actor(p1)
+ -- print_actor(p1)
+ print_promt()
+ if p1:did_collide(pikachu) then
+  print("you caught pikachu!",0,112,7)
+  print("colision count: "..#p1.obst_col/2-1,0,120,7)
+  foreach(actors,actor.stop)
+ end
 end
 
 __gfx__
